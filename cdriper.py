@@ -4,7 +4,8 @@ import sys
 cdName = "/dev/cdrom"
 format = 'wav'
 tracks = []
-outputFolder = '.'
+outputFolder = ''
+ffmpegFolder='./ffmpeg/'
 
 help = """Arguments:
 -cd         Specify cdrom to use, use: -cd <path>
@@ -75,7 +76,7 @@ print("Reading CD")  # informs the user
 
 try:
     cd_info_raw = ffmpeg.probe(
-        cdName, f='libcdio', print_format='json', show_chapters=None)  # reads json from the CD
+        cdName, cmd=ffmpegFolder+'ffprobe',f='libcdio', print_format='json', show_chapters=None)  # reads json from the CD
 except ffmpeg.Error as e:
     print(str(e.stderr), file=sys.stderr)
     sys.exit(1)
@@ -102,7 +103,7 @@ for track in toConvert:
         trackOut = ffmpeg.output(trackIn, outputFolder+track["tags"]["title"]+"."+format)
     print("Ripping %s..." % track["tags"]["title"])
     try:
-        ffmpeg.run(trackOut, quiet=True, overwrite_output=True)  # rips
+        ffmpeg.run(trackOut, cmd=ffmpegFolder+'ffmpeg', quiet=True, overwrite_output=True)  # rips
     except ffmpeg.Error as e:
         print(str(e.stderr), file=sys.stderr)
         sys.exit(1)
